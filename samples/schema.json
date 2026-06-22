@@ -1,0 +1,18 @@
+{
+  "tables": [
+    {
+      "name": "orders",
+      "fields": [
+        { "name": "user", "kind": "record<user>" },
+        { "name": "total", "kind": "option<number>" },
+        { "name": "created_at", "kind": "datetime" }
+      ]
+    },
+    {
+      "name": "user",
+      "fields": [
+        { "name": "name", "kind": "string" }
+      ]
+    }
+  ]
+}

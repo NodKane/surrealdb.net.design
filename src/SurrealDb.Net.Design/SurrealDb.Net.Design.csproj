@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>SurrealDb.Net.Design</AssemblyName>
+    <PackageId>SurrealDb.Net.Design</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>NodKane</Authors>
+    <Description>Design-time CLI tooling for scaffolding C# SurrealDbRecord models from SurrealDB schemas.</Description>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>surrealdb-design</ToolCommandName>
+  </PropertyGroup>
+
+</Project>
