@@ -13,7 +13,8 @@ This repository currently contains the first minimal CLI shape:
 - For every table, it reads field metadata with `INFO FOR TABLE <table> STRUCTURE`.
 - It generates one C# `partial` class per table.
 - It generates one C# `partial` query context with `IQueryable<T>` table entry points.
-- Generated classes inherit from `SurrealDbRecord` by default.
+- Generated classes implement `IRecord` by default.
+- Generated classes map SurrealDB's intrinsic `id` value to `RecordId? Id`.
 - Generated classes use `[Table("...")]` and `[Column("...")]` annotations from `System.ComponentModel.DataAnnotations.Schema`.
 
 ## Usage
@@ -44,14 +45,21 @@ For a SurrealDB table named `orders` with `user` defined as `record<user>` and `
 
 ```csharp
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 using Dahomey.Cbor.Attributes;
+using SurrealDb.Net.Json;
 using SurrealDb.Net.Models;
 
 namespace MyApp.Models;
 
 [Table("orders")]
-public partial class Order : SurrealDbRecord
+public partial class Order : IRecord
 {
+    [JsonConverter(typeof(ReadOnlyRecordIdJsonConverter))]
+    [CborProperty("id")]
+    [CborIgnoreIfDefault]
+    public RecordId? Id { get; set; }
+
     [Column("user")]
     public User User { get; set; }
 
@@ -101,7 +109,7 @@ Options:
   --context <name>             Name for the generated query context. Defaults to <Database>DbContext.
   --context-namespace <name>   Namespace for the generated query context. Defaults to --model-namespace.
   --no-context                 Do not generate a query context.
-  --record-base-type <type>    Base type for generated records. Defaults to SurrealDbRecord.
+  --record-base-type <type>    Base type for generated records. Defaults to IRecord.
   --record-namespace <name>    Namespace imported for the record base type. Defaults to SurrealDb.Net.Models.
   --table <name>               Restrict generation to one table. Can be repeated or comma-separated.
   --schema-file <path>         Read schema from a local JSON file instead of SurrealDB.

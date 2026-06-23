@@ -1,0 +1,9 @@
+DEFINE TABLE IF NOT EXISTS user SCHEMAFULL;
+DEFINE FIELD name ON TABLE user TYPE string;
+DEFINE FIELD email ON TABLE user TYPE string;
+
+DEFINE TABLE IF NOT EXISTS orders SCHEMAFULL;
+DEFINE FIELD user_email ON TABLE orders TYPE string;
+DEFINE FIELD total ON TABLE orders TYPE number;
+DEFINE FIELD status ON TABLE orders TYPE string;
+DEFINE FIELD created_at ON TABLE orders TYPE datetime;

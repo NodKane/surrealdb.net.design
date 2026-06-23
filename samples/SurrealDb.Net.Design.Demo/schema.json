@@ -1,0 +1,20 @@
+{
+  "tables": [
+    {
+      "name": "user",
+      "fields": [
+        { "name": "name", "kind": "string" },
+        { "name": "email", "kind": "string" }
+      ]
+    },
+    {
+      "name": "orders",
+      "fields": [
+        { "name": "user_email", "kind": "string" },
+        { "name": "total", "kind": "number" },
+        { "name": "status", "kind": "string" },
+        { "name": "created_at", "kind": "datetime" }
+      ]
+    }
+  ]
+}
