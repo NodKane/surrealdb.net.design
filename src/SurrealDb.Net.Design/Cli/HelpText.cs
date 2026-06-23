@@ -23,7 +23,7 @@ internal static class HelpText
               --context <name>             Name for the generated query context. Defaults to <Database>DbContext.
               --context-namespace <name>   Namespace for the generated query context. Defaults to --model-namespace.
               --no-context                 Do not generate a query context.
-              --record-base-type <type>    Base type for generated records. Defaults to SurrealDbRecord.
+              --record-base-type <type>    Base type for generated records. Defaults to IRecord.
               --record-namespace <name>    Namespace imported for the record base type. Defaults to SurrealDb.Net.Models.
               --table <name>               Restrict generation to one table. Can be repeated or comma-separated.
               --schema-file <path>         Read schema from a local JSON file instead of SurrealDB.

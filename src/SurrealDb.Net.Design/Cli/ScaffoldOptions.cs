@@ -80,7 +80,7 @@ internal sealed record ScaffoldOptions(
             Option(values, "context") ?? Generation.CSharpIdentifier.ForContextName(database),
             Option(values, "context-namespace") ?? modelNamespace,
             !flags.Contains("no-context"),
-            Option(values, "record-base-type") ?? "SurrealDbRecord",
+            Option(values, "record-base-type") ?? "IRecord",
             Option(values, "record-namespace") ?? "SurrealDb.Net.Models",
             ParseTables(values),
             schemaFile,

@@ -32,6 +32,7 @@ internal static class CSharpModelGenerator
         ScaffoldOptions options)
     {
         var properties = record.Fields
+            .Where(field => !string.Equals(field.Name, "id", StringComparison.OrdinalIgnoreCase))
             .OrderBy(field => field.Name, StringComparer.OrdinalIgnoreCase)
             .Select(field => new GeneratedProperty(
                 field,
@@ -46,13 +47,16 @@ internal static class CSharpModelGenerator
         builder.AppendLine("using System;");
         builder.AppendLine("using System.Collections.Generic;");
         builder.AppendLine("using System.ComponentModel.DataAnnotations.Schema;");
+        builder.AppendLine("using System.Text.Json.Serialization;");
+        builder.AppendLine("using Dahomey.Cbor.Attributes;");
+        builder.AppendLine("using SurrealDb.Net.Json;");
+        builder.AppendLine("using SurrealDb.Net.Models;");
 
-        if (properties.Any(property => property.Type.IsNullable))
-        {
-            builder.AppendLine("using Dahomey.Cbor.Attributes;");
-        }
-
-        if (!string.IsNullOrWhiteSpace(options.RecordNamespace))
+        if (!string.IsNullOrWhiteSpace(options.RecordNamespace) &&
+            !string.Equals(options.RecordNamespace, "SurrealDb.Net.Models", StringComparison.Ordinal) &&
+            !string.Equals(options.RecordNamespace, "SurrealDb.Net.Json", StringComparison.Ordinal) &&
+            !string.Equals(options.RecordNamespace, "Dahomey.Cbor.Attributes", StringComparison.Ordinal) &&
+            !string.Equals(options.RecordNamespace, "System.Text.Json.Serialization", StringComparison.Ordinal))
         {
             builder.AppendLine($"using {options.RecordNamespace};");
         }
@@ -63,6 +67,11 @@ internal static class CSharpModelGenerator
         builder.AppendLine($"[Table(\"{CSharpIdentifier.EscapeStringLiteral(record.TableName)}\")]");
         builder.AppendLine($"public partial class {CSharpIdentifier.Escape(className)} : {options.RecordBaseType}");
         builder.AppendLine("{");
+        builder.AppendLine("    [JsonConverter(typeof(ReadOnlyRecordIdJsonConverter))]");
+        builder.AppendLine("    [CborProperty(\"id\")]");
+        builder.AppendLine("    [CborIgnoreIfDefault]");
+        builder.AppendLine("    public RecordId? Id { get; set; }");
+        builder.AppendLine();
 
         foreach (var property in properties)
         {
@@ -77,7 +86,7 @@ internal static class CSharpModelGenerator
             builder.AppendLine();
         }
 
-        if (record.Fields.Count == 0)
+        if (properties.Length == 0)
         {
             builder.AppendLine("    // This table has no schema fields defined yet.");
         }

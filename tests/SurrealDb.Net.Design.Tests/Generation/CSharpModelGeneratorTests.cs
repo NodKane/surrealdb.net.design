@@ -35,8 +35,43 @@ public sealed class CSharpModelGeneratorTests
         var orderFile = files.Should().Contain(file => file.Path.EndsWith("Order.cs")).Subject;
 
         orderFile.Content.Should().Contain("public User User { get; set; } = default!;");
-        orderFile.Content.Should().NotContain("[CborIgnoreIfDefault]");
-        orderFile.Content.Should().NotContain("using Dahomey.Cbor.Attributes;");
+    }
+
+    [Fact]
+    public void Generate_adds_record_id_mapping_to_records()
+    {
+        var schema = new DatabaseSchema([
+            new RecordSchema("user", [
+                new FieldSchema("name", "string")
+            ])
+        ]);
+        var files = CSharpModelGenerator.Generate(schema, CreateOptions());
+        var userFile = files.Should().Contain(file => file.Path.EndsWith("User.cs")).Subject;
+
+        userFile.Content.Should().Contain("using Dahomey.Cbor.Attributes;");
+        userFile.Content.Should().Contain("using SurrealDb.Net.Json;");
+        userFile.Content.Should().Contain("using SurrealDb.Net.Models;");
+        userFile.Content.Should().Contain("using System.Text.Json.Serialization;");
+        userFile.Content.Should().Contain("[JsonConverter(typeof(ReadOnlyRecordIdJsonConverter))]");
+        userFile.Content.Should().Contain("[CborProperty(\"id\")]");
+        userFile.Content.Should().Contain("[CborIgnoreIfDefault]");
+        userFile.Content.Should().Contain("public RecordId? Id { get; set; }");
+    }
+
+    [Fact]
+    public void Generate_treats_schema_id_field_as_record_id()
+    {
+        var schema = new DatabaseSchema([
+            new RecordSchema("user", [
+                new FieldSchema("id", "string"),
+                new FieldSchema("name", "string")
+            ])
+        ]);
+        var files = CSharpModelGenerator.Generate(schema, CreateOptions());
+        var userFile = files.Should().Contain(file => file.Path.EndsWith("User.cs")).Subject;
+
+        userFile.Content.Split("public RecordId? Id { get; set; }").Length.Should().Be(2);
+        userFile.Content.Should().NotContain("[Column(\"id\")]");
     }
 
     [Fact]
@@ -54,8 +89,6 @@ public sealed class CSharpModelGeneratorTests
         var orderFile = files.Should().Contain(file => file.Path.EndsWith("Order.cs")).Subject;
 
         orderFile.Content.Should().Contain("public List<User> Users { get; set; } = default!;");
-        orderFile.Content.Should().NotContain("[CborIgnoreIfDefault]");
-        orderFile.Content.Should().NotContain("using Dahomey.Cbor.Attributes;");
     }
 
     [Fact]
@@ -121,7 +154,7 @@ public sealed class CSharpModelGeneratorTests
             ContextName: "MainDbContext",
             ContextNamespace: "MyApp.Models",
             GenerateContext: true,
-            RecordBaseType: "SurrealDbRecord",
+            RecordBaseType: "IRecord",
             RecordNamespace: "SurrealDb.Net.Models",
             Tables: new HashSet<string>(StringComparer.OrdinalIgnoreCase),
             SchemaFile: null,

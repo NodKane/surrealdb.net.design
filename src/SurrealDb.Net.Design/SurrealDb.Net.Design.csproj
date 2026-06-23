@@ -5,7 +5,7 @@
     <PackageId>SurrealDb.Net.Design</PackageId>
     <Version>0.1.0</Version>
     <Authors>NodKane</Authors>
-    <Description>Design-time CLI tooling for scaffolding C# SurrealDbRecord models from SurrealDB schemas.</Description>
+    <Description>Design-time CLI tooling for scaffolding C# record models from SurrealDB schemas.</Description>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
