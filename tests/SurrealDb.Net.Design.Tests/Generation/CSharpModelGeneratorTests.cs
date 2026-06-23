@@ -93,6 +93,20 @@ public sealed class CSharpModelGeneratorTests
         orderFile.Content.Should().Contain("public double? Total { get; set; }");
     }
 
+    [Fact]
+    public void Generate_maps_datetime_to_datetime()
+    {
+        var schema = new DatabaseSchema([
+            new RecordSchema("orders", [
+                new FieldSchema("created_at", "datetime")
+            ])
+        ]);
+        var files = CSharpModelGenerator.Generate(schema, CreateOptions());
+        var orderFile = files.Should().Contain(file => file.Path.EndsWith("Order.cs")).Subject;
+
+        orderFile.Content.Should().Contain("public DateTime CreatedAt { get; set; }");
+    }
+
     private static ScaffoldOptions CreateOptions()
     {
         return new ScaffoldOptions(

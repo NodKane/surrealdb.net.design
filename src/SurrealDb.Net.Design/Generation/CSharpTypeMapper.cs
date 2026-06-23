@@ -43,7 +43,7 @@ internal sealed class CSharpTypeMapper(IReadOnlyDictionary<string, string> recor
             "int" or "integer" => ValueType("long"),
             "float" or "number" => ValueType("double"),
             "decimal" => ValueType("decimal"),
-            "datetime" => ValueType("DateTimeOffset"),
+            "datetime" => ValueType("DateTime"),
             "duration" => ValueType("TimeSpan"),
             "bytes" => ReferenceType("byte[]"),
             _ => new CSharpPropertyType("object?", IsNullable: true, RequiresDefaultInitializer: false)
