@@ -12,6 +12,7 @@ This repository currently contains the first minimal CLI shape:
 - The command reads table metadata with `INFO FOR DB`.
 - For every table, it reads field metadata with `INFO FOR TABLE <table> STRUCTURE`.
 - It generates one C# `partial` class per table.
+- It generates one C# `partial` query context with `IQueryable<T>` table entry points.
 - Generated classes inherit from `SurrealDbRecord` by default.
 - Generated classes use `[Table("...")]` and `[Column("...")]` annotations from `System.ComponentModel.DataAnnotations.Schema`.
 
@@ -62,6 +63,27 @@ public partial class Order : SurrealDbRecord
 
 Because the classes are generated as `partial`, custom behavior can live in separate partial files next to the generated model files.
 
+For a SurrealDB database named `app`, the command also generates an `AppDbContext` by default:
+
+```csharp
+using System.Linq;
+using SurrealDb.Net;
+
+namespace MyApp.Models;
+
+public partial class AppDbContext
+{
+    private readonly ISurrealDbClient _surrealDbClient;
+
+    public AppDbContext(ISurrealDbClient surrealDbClient)
+    {
+        _surrealDbClient = surrealDbClient;
+    }
+
+    public IQueryable<Order> Orders => _surrealDbClient.Select<Order>();
+}
+```
+
 ## Command Options
 
 ```text
@@ -76,6 +98,9 @@ Options:
   --token <value>              Bearer token. Defaults to $SURREALDB_TOKEN.
   --output <path>              Output directory. Defaults to Generated.
   --model-namespace <name>     Namespace for generated classes. Defaults to SurrealDb.Generated.
+  --context <name>             Name for the generated query context. Defaults to <Database>DbContext.
+  --context-namespace <name>   Namespace for the generated query context. Defaults to --model-namespace.
+  --no-context                 Do not generate a query context.
   --record-base-type <type>    Base type for generated records. Defaults to SurrealDbRecord.
   --record-namespace <name>    Namespace imported for the record base type. Defaults to SurrealDb.Net.Models.
   --table <name>               Restrict generation to one table. Can be repeated or comma-separated.

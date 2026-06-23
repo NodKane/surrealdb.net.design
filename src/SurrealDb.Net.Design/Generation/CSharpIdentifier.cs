@@ -25,6 +25,17 @@ internal static partial class CSharpIdentifier
         return ToPascalCase(fieldName);
     }
 
+    public static string ForContextName(string databaseName)
+    {
+        var name = ToPascalCase(databaseName);
+        return name.EndsWith("Db", StringComparison.Ordinal) ? $"{name}Context" : $"{name}DbContext";
+    }
+
+    public static string ForQueryPropertyName(string tableName)
+    {
+        return Pluralize(ForClassName(tableName));
+    }
+
     public static string Escape(string identifier)
     {
         return Keywords.Contains(identifier) ? $"@{identifier}" : identifier;
@@ -48,6 +59,28 @@ internal static partial class CSharpIdentifier
         }
 
         return value;
+    }
+
+    private static string Pluralize(string value)
+    {
+        if (value.EndsWith('y') && value.Length > 1 && !IsVowel(value[^2]))
+        {
+            return $"{value[..^1]}ies";
+        }
+
+        if (value.EndsWith('s') || value.EndsWith('x') || value.EndsWith('z') ||
+            value.EndsWith("ch", StringComparison.OrdinalIgnoreCase) ||
+            value.EndsWith("sh", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"{value}es";
+        }
+
+        return $"{value}s";
+    }
+
+    private static bool IsVowel(char value)
+    {
+        return char.ToUpperInvariant(value) is 'A' or 'E' or 'I' or 'O' or 'U';
     }
 
     private static string ToPascalCase(string value)

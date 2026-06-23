@@ -3,11 +3,11 @@ using SurrealDb.Net.Design.Cli;
 
 namespace SurrealDb.Net.Design.Schema;
 
-internal sealed class JsonSchemaFileReader(string schemaFile) : ISchemaReader
+internal sealed class JsonSchemaFileReader(ScaffoldOptions options) : ISchemaReader
 {
     public async Task<DatabaseSchema> ReadAsync(CancellationToken cancellationToken)
     {
-        await using FileStream stream = File.OpenRead(schemaFile);
+        await using FileStream stream = File.OpenRead(options.SchemaFile!);
         using JsonDocument document = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
         JsonElement root = document.RootElement;
 
@@ -20,6 +20,11 @@ internal sealed class JsonSchemaFileReader(string schemaFile) : ISchemaReader
         foreach (JsonElement table in tables.EnumerateArray())
         {
             string name = table.GetProperty("name").GetString() ?? throw new CliException("Every table entry needs a name.");
+            if (options.Tables.Count > 0 && !options.Tables.Contains(name))
+            {
+                continue;
+            }
+
             records.Add(new RecordSchema(name, ReadFields(table, name)));
         }
 

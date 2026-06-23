@@ -10,12 +10,17 @@ internal static class ScaffoldDbCommand
     {
         var reader = SchemaReaderFactory.Create(options);
         var schema = await reader.ReadAsync(options.CancellationToken);
-        var files = CSharpModelGenerator.Generate(schema, options);
+        var files = CSharpModelGenerator.Generate(schema, options).ToList();
 
         if (files.Count == 0)
         {
             Console.WriteLine("No tables were found.");
             return 0;
+        }
+
+        if (options.GenerateContext)
+        {
+            files.Add(CSharpContextGenerator.Generate(schema, options));
         }
 
         await GeneratedFileWriter.WriteAsync(files, options);

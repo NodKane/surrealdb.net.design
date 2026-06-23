@@ -8,6 +8,6 @@ internal static class SchemaReaderFactory
     {
         return string.IsNullOrWhiteSpace(options.SchemaFile)
             ? new SurrealDbHttpSchemaReader(options)
-            : new JsonSchemaFileReader(options.SchemaFile);
+            : new JsonSchemaFileReader(options);
     }
 }

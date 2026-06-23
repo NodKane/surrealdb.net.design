@@ -9,6 +9,9 @@ internal sealed record ScaffoldOptions(
     string? Token,
     string OutputDirectory,
     string ModelNamespace,
+    string ContextName,
+    string ContextNamespace,
+    bool GenerateContext,
     string RecordBaseType,
     string? RecordNamespace,
     IReadOnlySet<string> Tables,
@@ -30,7 +33,8 @@ internal sealed record ScaffoldOptions(
             }
 
             var name = arg[2..];
-            if (string.Equals(name, "overwrite", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(name, "overwrite", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(name, "no-context", StringComparison.OrdinalIgnoreCase))
             {
                 flags.Add(name);
                 continue;
@@ -61,15 +65,21 @@ internal sealed record ScaffoldOptions(
             schemaFile = Path.GetFullPath(schemaFile);
         }
 
+        var database = Option(values, "database") ?? Environment.GetEnvironmentVariable("SURREALDB_DB") ?? "main";
+        var modelNamespace = Option(values, "model-namespace") ?? "SurrealDb.Generated";
+
         return new ScaffoldOptions(
             endpoint,
             Option(values, "namespace") ?? Environment.GetEnvironmentVariable("SURREALDB_NS") ?? "main",
-            Option(values, "database") ?? Environment.GetEnvironmentVariable("SURREALDB_DB") ?? "main",
+            database,
             Option(values, "user") ?? Environment.GetEnvironmentVariable("SURREALDB_USER"),
             Option(values, "password") ?? Environment.GetEnvironmentVariable("SURREALDB_PASS"),
             Option(values, "token") ?? Environment.GetEnvironmentVariable("SURREALDB_TOKEN"),
             outputDirectory,
-            Option(values, "model-namespace") ?? "SurrealDb.Generated",
+            modelNamespace,
+            Option(values, "context") ?? Generation.CSharpIdentifier.ForContextName(database),
+            Option(values, "context-namespace") ?? modelNamespace,
+            !flags.Contains("no-context"),
             Option(values, "record-base-type") ?? "SurrealDbRecord",
             Option(values, "record-namespace") ?? "SurrealDb.Net.Models",
             ParseTables(values),
