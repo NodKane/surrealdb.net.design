@@ -23,11 +23,7 @@ From the repository:
 
 ```bash
 dotnet run --project src/SurrealDb.Net.Design -- scaffold db \
-  --endpoint http://localhost:8000 \
-  --namespace app \
-  --database app \
-  --user root \
-  --password secret \
+  --conection "Server=ws://localhost:8000/rpc;Namespace=app;Database=app;Username=root;Password=secret" \
   --output Models \
   --model-namespace MyApp.Models \
   --overwrite
@@ -36,7 +32,7 @@ dotnet run --project src/SurrealDb.Net.Design -- scaffold db \
 When packed as a .NET tool, the command name is:
 
 ```bash
-surrealdb-design scaffold db --endpoint http://localhost:8000 --namespace app --database app
+surrealdb-design scaffold db --conection "Server=ws://localhost:8000/rpc;Namespace=app;Database=app;Username=root;Password=secret"
 ```
 
 ## Generated Code
@@ -98,12 +94,13 @@ public partial class AppDbContext
 surrealdb-design scaffold db [options]
 
 Options:
-  --endpoint <url>             SurrealDB endpoint. Defaults to http://localhost:8000.
-  --namespace <name>           SurrealDB namespace. Defaults to $SURREALDB_NS or main.
-  --database <name>            SurrealDB database. Defaults to $SURREALDB_DB or main.
-  --user <name>                Basic auth username. Defaults to $SURREALDB_USER.
-  --password <value>           Basic auth password. Defaults to $SURREALDB_PASS.
-  --token <value>              Bearer token. Defaults to $SURREALDB_TOKEN.
+  --conection <value>          SurrealDB connection string. Defaults to $SURREALDB_CONNECTION_STRING.
+  --endpoint <url>             Override connection string server. Defaults to http://localhost:8000.
+  --namespace <name>           Override connection string namespace. Defaults to $SURREALDB_NS or main.
+  --database <name>            Override connection string database. Defaults to $SURREALDB_DB or main.
+  --user <name>                Override connection string username. Defaults to $SURREALDB_USER.
+  --password <value>           Override connection string password. Defaults to $SURREALDB_PASS.
+  --token <value>              Override connection string bearer token. Defaults to $SURREALDB_TOKEN.
   --output <path>              Output directory. Defaults to Generated.
   --model-namespace <name>     Namespace for generated classes. Defaults to SurrealDb.Generated.
   --context <name>             Name for the generated query context. Defaults to <Database>DbContext.

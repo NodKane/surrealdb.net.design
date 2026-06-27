@@ -1,3 +1,5 @@
+using System.Data.Common;
+
 namespace SurrealDb.Net.Design.Cli;
 
 internal sealed record ScaffoldOptions(
@@ -54,9 +56,18 @@ internal sealed record ScaffoldOptions(
             optionValues.Add(args[++i]);
         }
 
-        var endpoint = Uri.TryCreate(Option(values, "endpoint") ?? "http://localhost:8000", UriKind.Absolute, out Uri? parsedEndpoint)
+        var connectionString = Option(values, "conection") ?? Environment.GetEnvironmentVariable("SURREALDB_CONNECTION_STRING");
+        var connection = ConnectionStringValues.Parse(connectionString);
+
+        var endpointValue = Option(values, "endpoint") ?? connection.Server ?? "http://localhost:8000";
+        var endpoint = Uri.TryCreate(endpointValue, UriKind.Absolute, out Uri? parsedEndpoint)
             ? parsedEndpoint
             : throw new CliException("--endpoint must be an absolute URI.");
+
+        if (Option(values, "endpoint") is null)
+        {
+            endpoint = NormalizeConnectionStringEndpoint(endpoint);
+        }
 
         var outputDirectory = Path.GetFullPath(Option(values, "output") ?? "Generated");
         var schemaFile = Option(values, "schema-file");
@@ -65,16 +76,16 @@ internal sealed record ScaffoldOptions(
             schemaFile = Path.GetFullPath(schemaFile);
         }
 
-        var database = Option(values, "database") ?? Environment.GetEnvironmentVariable("SURREALDB_DB") ?? "main";
+        var database = Option(values, "database") ?? connection.Database ?? Environment.GetEnvironmentVariable("SURREALDB_DB") ?? "main";
         var modelNamespace = Option(values, "model-namespace") ?? "SurrealDb.Generated";
 
         return new ScaffoldOptions(
             endpoint,
-            Option(values, "namespace") ?? Environment.GetEnvironmentVariable("SURREALDB_NS") ?? "main",
+            Option(values, "namespace") ?? connection.Namespace ?? Environment.GetEnvironmentVariable("SURREALDB_NS") ?? "main",
             database,
-            Option(values, "user") ?? Environment.GetEnvironmentVariable("SURREALDB_USER"),
-            Option(values, "password") ?? Environment.GetEnvironmentVariable("SURREALDB_PASS"),
-            Option(values, "token") ?? Environment.GetEnvironmentVariable("SURREALDB_TOKEN"),
+            Option(values, "user") ?? connection.User ?? Environment.GetEnvironmentVariable("SURREALDB_USER"),
+            Option(values, "password") ?? connection.Password ?? Environment.GetEnvironmentVariable("SURREALDB_PASS"),
+            Option(values, "token") ?? connection.Token ?? Environment.GetEnvironmentVariable("SURREALDB_TOKEN"),
             outputDirectory,
             modelNamespace,
             Option(values, "context") ?? Generation.CSharpIdentifier.ForContextName(database),
@@ -86,6 +97,28 @@ internal sealed record ScaffoldOptions(
             schemaFile,
             flags.Contains("overwrite"),
             CancellationToken.None);
+    }
+
+    private static Uri NormalizeConnectionStringEndpoint(Uri endpoint)
+    {
+        var scheme = endpoint.Scheme.ToLowerInvariant() switch
+        {
+            "ws" => Uri.UriSchemeHttp,
+            "wss" => Uri.UriSchemeHttps,
+            _ => endpoint.Scheme
+        };
+
+        var builder = new UriBuilder(endpoint)
+        {
+            Scheme = scheme
+        };
+
+        if (builder.Path.EndsWith("/rpc", StringComparison.OrdinalIgnoreCase))
+        {
+            builder.Path = builder.Path[..^4].TrimEnd('/');
+        }
+
+        return builder.Uri;
     }
 
     private static string? Option(IReadOnlyDictionary<string, List<string>> values, string name)
@@ -110,5 +143,55 @@ internal sealed record ScaffoldOptions(
         }
 
         return tables;
+    }
+
+    private sealed record ConnectionStringValues(
+        string? Server,
+        string? Namespace,
+        string? Database,
+        string? User,
+        string? Password,
+        string? Token)
+    {
+        public static ConnectionStringValues Parse(string? connectionString)
+        {
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                return new ConnectionStringValues(null, null, null, null, null, null);
+            }
+
+            try
+            {
+                var builder = new DbConnectionStringBuilder
+                {
+                    ConnectionString = connectionString
+                };
+
+                return new ConnectionStringValues(
+                    Value(builder, "Server", "Endpoint", "Url", "Host"),
+                    Value(builder, "Namespace", "NS"),
+                    Value(builder, "Database", "DB"),
+                    Value(builder, "Username", "User", "UserName"),
+                    Value(builder, "Password", "Pass"),
+                    Value(builder, "Token", "AuthToken", "AccessToken"));
+            }
+            catch (ArgumentException ex)
+            {
+                throw new CliException($"--conection is invalid: {ex.Message}");
+            }
+        }
+
+        private static string? Value(DbConnectionStringBuilder builder, params string[] names)
+        {
+            foreach (string name in names)
+            {
+                if (builder.TryGetValue(name, out object? value) && value is not null)
+                {
+                    return value.ToString();
+                }
+            }
+
+            return null;
+        }
     }
 }

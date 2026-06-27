@@ -12,12 +12,13 @@ internal static class HelpText
               surrealdb-design scaffold db [options]
 
             Options:
-              --endpoint <url>             SurrealDB endpoint. Defaults to http://localhost:8000.
-              --namespace <name>           SurrealDB namespace. Defaults to $SURREALDB_NS or main.
-              --database <name>            SurrealDB database. Defaults to $SURREALDB_DB or main.
-              --user <name>                Basic auth username. Defaults to $SURREALDB_USER.
-              --password <value>           Basic auth password. Defaults to $SURREALDB_PASS.
-              --token <value>              Bearer token. Defaults to $SURREALDB_TOKEN.
+              --conection <value>          SurrealDB connection string. Defaults to $SURREALDB_CONNECTION_STRING.
+              --endpoint <url>             Override connection string server. Defaults to http://localhost:8000.
+              --namespace <name>           Override connection string namespace. Defaults to $SURREALDB_NS or main.
+              --database <name>            Override connection string database. Defaults to $SURREALDB_DB or main.
+              --user <name>                Override connection string username. Defaults to $SURREALDB_USER.
+              --password <value>           Override connection string password. Defaults to $SURREALDB_PASS.
+              --token <value>              Override connection string bearer token. Defaults to $SURREALDB_TOKEN.
               --output <path>              Output directory. Defaults to Generated.
               --model-namespace <name>     Namespace for generated classes. Defaults to SurrealDb.Generated.
               --context <name>             Name for the generated query context. Defaults to <Database>DbContext.
@@ -31,7 +32,7 @@ internal static class HelpText
               -h, --help                   Show help.
 
             Example:
-              surrealdb-design scaffold db --endpoint http://localhost:8000 --namespace app --database app --user root --password secret --output Models --model-namespace MyApp.Models --overwrite
+              surrealdb-design scaffold db --conection "Server=ws://localhost:8000/rpc;Namespace=app;Database=app;Username=root;Password=secret" --output Models --model-namespace MyApp.Models --overwrite
             """);
     }
 }

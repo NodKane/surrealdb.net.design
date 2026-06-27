@@ -18,7 +18,7 @@ The current official `SurrealDb.Net` package exposes `Select<T>("table", cancell
 ```bash
 dotnet run --project ../../src/SurrealDb.Net.Design -- scaffold db \
   --schema-file schema.json \
-  --database app \
+  --conection "Server=ws://localhost:8000/rpc;Namespace=app;Database=app;Username=root;Password=root" \
   --output Generated \
   --model-namespace SurrealDb.Net.Design.Demo.Generated \
   --no-context \
