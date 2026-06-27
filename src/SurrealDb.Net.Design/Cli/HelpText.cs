@@ -12,7 +12,7 @@ internal static class HelpText
               surrealdb-design scaffold db [options]
 
             Options:
-              --conection <value>          SurrealDB connection string. Defaults to $SURREALDB_CONNECTION_STRING.
+              --connection <value>         SurrealDB connection string. Defaults to $SURREALDB_CONNECTION_STRING.
               --endpoint <url>             Override connection string server. Defaults to http://localhost:8000.
               --namespace <name>           Override connection string namespace. Defaults to $SURREALDB_NS or main.
               --database <name>            Override connection string database. Defaults to $SURREALDB_DB or main.
@@ -32,7 +32,7 @@ internal static class HelpText
               -h, --help                   Show help.
 
             Example:
-              surrealdb-design scaffold db --conection "Server=ws://localhost:8000/rpc;Namespace=app;Database=app;Username=root;Password=secret" --output Models --model-namespace MyApp.Models --overwrite
+              surrealdb-design scaffold db --connection "Server=ws://localhost:8000/rpc;Namespace=app;Database=app;Username=root;Password=secret" --output Models --model-namespace MyApp.Models --overwrite
             """);
     }
 }

@@ -56,7 +56,7 @@ internal sealed record ScaffoldOptions(
             optionValues.Add(args[++i]);
         }
 
-        var connectionString = Option(values, "conection") ?? Environment.GetEnvironmentVariable("SURREALDB_CONNECTION_STRING");
+        var connectionString = Option(values, "connection", "conection") ?? Environment.GetEnvironmentVariable("SURREALDB_CONNECTION_STRING");
         var connection = ConnectionStringValues.Parse(connectionString);
 
         var endpointValue = Option(values, "endpoint") ?? connection.Server ?? "http://localhost:8000";
@@ -121,9 +121,17 @@ internal sealed record ScaffoldOptions(
         return builder.Uri;
     }
 
-    private static string? Option(IReadOnlyDictionary<string, List<string>> values, string name)
+    private static string? Option(IReadOnlyDictionary<string, List<string>> values, params string[] names)
     {
-        return values.TryGetValue(name, out List<string>? optionValues) ? optionValues.LastOrDefault() : null;
+        foreach (string name in names)
+        {
+            if (values.TryGetValue(name, out List<string>? optionValues))
+            {
+                return optionValues.LastOrDefault();
+            }
+        }
+
+        return null;
     }
 
     private static HashSet<string> ParseTables(IReadOnlyDictionary<string, List<string>> values)
@@ -177,7 +185,7 @@ internal sealed record ScaffoldOptions(
             }
             catch (ArgumentException ex)
             {
-                throw new CliException($"--conection is invalid: {ex.Message}");
+                throw new CliException($"--connection is invalid: {ex.Message}");
             }
         }
 

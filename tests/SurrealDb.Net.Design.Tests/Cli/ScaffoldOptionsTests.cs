@@ -9,7 +9,7 @@ public sealed class ScaffoldOptionsTests
     public void Parse_uses_connection_string_for_database_connection_options()
     {
         var options = ScaffoldOptions.Parse([
-            "--conection",
+            "--connection",
             "Server=ws://127.0.0.1:8000/rpc;Namespace=app;Database=shop;Username=root;Password=secret"
         ]);
 
@@ -24,7 +24,7 @@ public sealed class ScaffoldOptionsTests
     public void Parse_lets_explicit_options_override_connection_string_values()
     {
         var options = ScaffoldOptions.Parse([
-            "--conection",
+            "--connection",
             "Server=ws://127.0.0.1:8000/rpc;Namespace=app;Database=shop;Username=root;Password=secret",
             "--endpoint",
             "https://surreal.example.test",
@@ -49,7 +49,7 @@ public sealed class ScaffoldOptionsTests
     public void Parse_accepts_connection_string_aliases()
     {
         var options = ScaffoldOptions.Parse([
-            "--conection",
+            "--connection",
             "Endpoint=wss://surreal.example.test/rpc;NS=app;DB=shop;UserName=root;Pass=secret;AuthToken=token"
         ]);
 

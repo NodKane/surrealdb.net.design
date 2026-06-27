@@ -23,7 +23,7 @@ From the repository:
 
 ```bash
 dotnet run --project src/SurrealDb.Net.Design -- scaffold db \
-  --conection "Server=ws://localhost:8000/rpc;Namespace=app;Database=app;Username=root;Password=secret" \
+  --connection "Server=ws://localhost:8000/rpc;Namespace=app;Database=app;Username=root;Password=secret" \
   --output Models \
   --model-namespace MyApp.Models \
   --overwrite
@@ -33,6 +33,7 @@ When packed as a .NET tool, the command name is:
 
 ```bash
 surrealdb-design scaffold db --conection "Server=ws://localhost:8000/rpc;Namespace=app;Database=app;Username=root;Password=secret"
+surrealdb-design scaffold db --connection "Server=ws://localhost:8000/rpc;Namespace=app;Database=app;Username=root;Password=secret"
 ```
 
 ## Generated Code
