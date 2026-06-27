@@ -67,13 +67,21 @@ jobs:
           }
 
       - name: Restore
-        run: dotnet restore SurrealDb.Net.Design.slnx
+        shell: pwsh
+        run: |
+          dotnet restore src/SurrealDb.Net.Design/SurrealDb.Net.Design.csproj
+          dotnet restore src/SurrealDb.Net.Design.Tool/SurrealDb.Net.Design.Tool.csproj
+          dotnet restore tests/SurrealDb.Net.Design.Tests/SurrealDb.Net.Design.Tests.csproj
 
       - name: Build
-        run: dotnet build SurrealDb.Net.Design.slnx --configuration Release --no-restore
+        shell: pwsh
+        run: |
+          dotnet build src/SurrealDb.Net.Design/SurrealDb.Net.Design.csproj --configuration Release --no-restore
+          dotnet build src/SurrealDb.Net.Design.Tool/SurrealDb.Net.Design.Tool.csproj --configuration Release --no-restore
+          dotnet build tests/SurrealDb.Net.Design.Tests/SurrealDb.Net.Design.Tests.csproj --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test SurrealDb.Net.Design.slnx --configuration Release --no-build
+        run: dotnet test tests/SurrealDb.Net.Design.Tests/SurrealDb.Net.Design.Tests.csproj --configuration Release --no-build
 
       - name: Pack design package
         run: >
