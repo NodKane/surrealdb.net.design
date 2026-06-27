@@ -1,0 +1,108 @@
+name: Publish NuGet packages
+
+on:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Package version
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    name: Build, pack, and publish
+    runs-on: ubuntu-latest
+
+    env:
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+      DOTNET_NOLOGO: true
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Resolve package version
+        id: version
+        shell: pwsh
+        run: |
+          $version = "${{ github.event.release.tag_name }}"
+
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $version = "${{ inputs.version }}"
+          }
+
+          if ([string]::IsNullOrWhiteSpace($version)) {
+            throw "Package version could not be resolved."
+          }
+
+          $version = $version.Trim()
+          if ($version.StartsWith("v", [System.StringComparison]::OrdinalIgnoreCase)) {
+            $version = $version.Substring(1)
+          }
+
+          if ($version -notmatch '^\d+\.\d+\.\d+([-.][0-9A-Za-z.-]+)?$') {
+            throw "Package version '$version' is not a valid NuGet SemVer version."
+          }
+
+          "value=$version" >> $env:GITHUB_OUTPUT
+          "Using package version $version"
+
+      - name: Verify NuGet user
+        shell: pwsh
+        run: |
+          if ([string]::IsNullOrWhiteSpace("${{ vars.NUGET_USER }}")) {
+            throw "Repository variable NUGET_USER must contain your nuget.org username."
+          }
+
+      - name: Restore
+        run: dotnet restore SurrealDb.Net.Design.slnx
+
+      - name: Build
+        run: dotnet build SurrealDb.Net.Design.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test SurrealDb.Net.Design.slnx --configuration Release --no-build
+
+      - name: Pack design package
+        run: >
+          dotnet pack src/SurrealDb.Net.Design/SurrealDb.Net.Design.csproj
+          --configuration Release
+          --no-build
+          --output artifacts/packages
+          /p:PackageVersion=${{ steps.version.outputs.value }}
+
+      - name: Pack tool package
+        run: >
+          dotnet pack src/SurrealDb.Net.Design.Tool/SurrealDb.Net.Design.Tool.csproj
+          --configuration Release
+          --no-build
+          --output artifacts/packages
+          /p:PackageVersion=${{ steps.version.outputs.value }}
+
+      - name: NuGet login
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ vars.NUGET_USER }}
+
+      - name: Publish to nuget.org
+        shell: pwsh
+        run: |
+          Get-ChildItem artifacts/packages -Filter *.nupkg | ForEach-Object {
+            dotnet nuget push $_.FullName `
+              --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" `
+              --source https://www.nuget.org/api/v2/package `
+              --skip-duplicate
+          }
