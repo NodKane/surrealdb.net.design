@@ -3,6 +3,7 @@ obj/
 .vs/
 .vscode/
 Generated/
+artifacts/
 *.user
 *.suo
 *.nupkg

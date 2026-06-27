@@ -4,6 +4,7 @@
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/SurrealDb.Net.Design/SurrealDb.Net.Design.csproj" />
+    <Project Path="src/SurrealDb.Net.Design.Tool/SurrealDb.Net.Design.Tool.csproj" />
   </Folder>
   <Folder Name="/samples/">
     <Project Path="samples/SurrealDb.Net.Design.Demo/SurrealDb.Net.Design.Demo.csproj" />

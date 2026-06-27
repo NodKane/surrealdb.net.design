@@ -1,25 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>SurrealDb.Net.Design</AssemblyName>
-    <PackageId>SurrealDb.Net.Design</PackageId>
+    <AssemblyName>SurrealDb.Net.Design.Tool</AssemblyName>
+    <PackageId>SurrealDb.Net.Design.Tool</PackageId>
     <Version>0.1.0</Version>
     <Authors>NodKane</Authors>
-    <Description>Design-time CLI tooling for scaffolding C# record models from SurrealDB schemas.</Description>
-    <PackageTags>surrealdb;design-time;scaffolding;package-manager-console</PackageTags>
+    <Description>Command-line tool for scaffolding C# record models from SurrealDB schemas.</Description>
+    <PackageTags>surrealdb;design-time;scaffolding;dotnet-tool</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <DevelopmentDependency>true</DevelopmentDependency>
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageType>Dependency</PackageType>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>surrealdb-design</ToolCommandName>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\README.md" Pack="true" PackagePath="\" />
-    <None Include="tools\init.ps1" Pack="true" PackagePath="tools\init.ps1" />
+    <ProjectReference Include="..\SurrealDb.Net.Design\SurrealDb.Net.Design.csproj" />
   </ItemGroup>
 
 </Project>

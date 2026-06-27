@@ -29,11 +29,35 @@ dotnet run --project src/SurrealDb.Net.Design -- scaffold db \
   --overwrite
 ```
 
-When packed as a .NET tool, the command name is:
+For command prompt usage, install the companion .NET tool package. The command name is:
 
 ```bash
-surrealdb-design scaffold db --conection "Server=ws://localhost:8000/rpc;Namespace=app;Database=app;Username=root;Password=secret"
+dotnet tool install --global SurrealDb.Net.Design.Tool
 surrealdb-design scaffold db --connection "Server=ws://localhost:8000/rpc;Namespace=app;Database=app;Username=root;Password=secret"
+```
+
+From Visual Studio's Package Manager Console, install the NuGet package and use the package command:
+
+```powershell
+Install-Package SurrealDb.Net.Design
+
+Scaffold-SurrealDbDatabase `
+  -Connection "Server=ws://localhost:8000/rpc;Namespace=app;Database=app;Username=root;Password=secret" `
+  -Output Models `
+  -ModelNamespace MyApp.Models `
+  -Overwrite
+```
+
+`Scaffold-SurrealDbContext` is available as an alias for the same Package Manager Console command. The optional `-Project` parameter runs the command from a specific project's directory so relative output paths land in that project.
+
+The Package Manager Console command is provided by the `SurrealDb.Net.Design` package. The command prompt command is provided by the `SurrealDb.Net.Design.Tool` dotnet tool package.
+
+For local command prompt usage, you can install the tool through a tool manifest:
+
+```bash
+dotnet new tool-manifest
+dotnet tool install SurrealDb.Net.Design.Tool
+dotnet surrealdb-design scaffold db --connection "Server=ws://localhost:8000/rpc;Namespace=app;Database=app;Username=root;Password=secret"
 ```
 
 ## Generated Code
@@ -95,7 +119,7 @@ public partial class AppDbContext
 surrealdb-design scaffold db [options]
 
 Options:
-  --conection <value>          SurrealDB connection string. Defaults to $SURREALDB_CONNECTION_STRING.
+  --connection <value>         SurrealDB connection string. Defaults to $SURREALDB_CONNECTION_STRING.
   --endpoint <url>             Override connection string server. Defaults to http://localhost:8000.
   --namespace <name>           Override connection string namespace. Defaults to $SURREALDB_NS or main.
   --database <name>            Override connection string database. Defaults to $SURREALDB_DB or main.
