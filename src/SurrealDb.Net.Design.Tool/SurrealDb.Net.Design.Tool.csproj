@@ -3,7 +3,7 @@
   <PropertyGroup>
     <AssemblyName>SurrealDb.Net.Design.Tool</AssemblyName>
     <PackageId>SurrealDb.Net.Design.Tool</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Authors>NodKane</Authors>
     <Description>Command-line tool for scaffolding C# record models from SurrealDB schemas.</Description>
     <PackageTags>surrealdb;design-time;scaffolding;dotnet-tool</PackageTags>
