@@ -2,6 +2,8 @@
 
 SurrealDb.Net.Design is an early design-time CLI for generating C# record models from a SurrealDB database schema.
 
+Project: https://github.com/NodKane/surrealdb.net.design
+
 The goal is intentionally similar to the design-time tooling people know from Entity Framework Core: connect to a database, inspect the schema, and scaffold source files that can be edited safely through `partial` classes.
 
 ## Status
