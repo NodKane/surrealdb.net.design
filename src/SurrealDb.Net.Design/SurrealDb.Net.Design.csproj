@@ -24,4 +24,8 @@
     <None Include="tools\**\*.ps1" Pack="true" PackagePath="tools\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="SurrealDb.Net" Version="[0.10.2,)" />
+  </ItemGroup>
+
 </Project>
